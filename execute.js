@@ -12,11 +12,23 @@ function scrapeGPT() {
   const result = [];
   for(let i=0;i<lengthConversation;i++){
     const question = document.querySelectorAll(selector + ` > div:nth-child(${i+1}) > div > div:nth-child(2) > div `)?.[0]?.textContent;
-    const answer = [...document.querySelectorAll(selector + ` > div:nth-child(${i+1}) > div > div:nth-child(2) > div > div > div *`)].filter(x => ["P","PRE"].includes(x.nodeName)).map(x => x.nodeName === "PRE" ? x.textContent.slice('Copy code'.length) : x.textContent).join("\n\n");
+    const answer = [...document.querySelectorAll(selector + ` > div:nth-child(${i+1}) > div > div:nth-child(2) > div > div > div *`)]
+    .filter(x => ["P","PRE","OL","UL"].includes(x.nodeName))
+    .map(x => {
+      if(x.nodeName === "OL") return [...x.children].map((x, index) => (index + 1) + ". " + removeQuotes(x.textContent)).join("\n")
+      if(x.nodeName === "UL") return [...x.children].map(x => removeQuotes(x.textContent)).join("\n")
+      if(x.nodeName === "PRE") return x.textContent.slice('Copy code'.length);
+      return x.textContent
+    })
+    .join("\n\n");
   
     result.push(answer || question);
   }
   return result;
+}
+
+function removeQuotes(text) {
+  return text.replace(/^“|”|"/g, '').replace(/“|”|"$/g, '');
 }
 
 function download(filename, text) {
