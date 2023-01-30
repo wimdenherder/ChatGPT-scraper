@@ -44,16 +44,16 @@ function download(filename, text) {
   document.body.removeChild(element);
 }
 
-function downloadGPT() {
+function downloadGPT(title) {
   const texts = scrapeGPT();
   const pre = `
 ------------------------------------------------------------
   
   `
-  download('GPT ' + document.title + " " + texts[0].slice(0,60) + ".txt", pre + texts.join("\n\n------------------------------------------------------------\n\n"));
+  download('GPT ' + title + " " + texts[0].slice(0,60) + ".txt", pre + texts.join("\n\n------------------------------------------------------------\n\n"));
 }
 
-function downloadGPTFilePerQuestion() {
+function downloadGPTFilePerQuestion(title) {
   const texts = scrapeGPT();
   const pre = `
 
@@ -61,10 +61,16 @@ function downloadGPTFilePerQuestion() {
   
   `
   for(let i=0;i<texts.length/2 - 1;i++){
-    download('GPT ' + document.title + ": " + texts[i*2].slice(0,60) + `.txt`, pre + texts[i*2] + pre + texts[i*2+1]);
+    download('GPT ' + title + ": " + texts[i*2].slice(0,60) + `.txt`, pre + texts[i*2] + pre + texts[i*2+1]);
   }
 }
 
-downloadGPT();
-if(scrapeGPT().length > 2)
-  downloadGPTFilePerQuestion();
+function main() {
+  const title = prompt("What filename do you want to use? (only text, not .txt)", document.title);
+  if(title === null) return;
+  downloadGPT(title);
+  // if(scrapeGPT().length > 2)
+  //   downloadGPTFilePerQuestion(title);
+}
+
+main();
