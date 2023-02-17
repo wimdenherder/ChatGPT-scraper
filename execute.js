@@ -15,21 +15,24 @@ function scrapeGPT() {
     const answer = [...document.querySelectorAll(selector + ` > div:nth-child(${i+1}) > div > div:nth-child(2) > div > div > div *`)]
     .filter(x => ["P","PRE","OL","UL"].includes(x.nodeName))
     .map(x => {
-      if(x.nodeName === "OL") return [...x.children].map((x, index) => (index + 1) + ". " + removeQuotes(x.textContent)).join("\n")
-      if(x.nodeName === "UL") return [...x.children].map(x => removeQuotes(x.textContent)).join("\n")
+      if(x.nodeName === "OL") return [...x.children].map((x, index) => (index + 1) + ". " + _removeQuotes(x.textContent)).join("\n")
+      if(x.nodeName === "UL") return [...x.children].map(x => _removeQuotes(x.textContent)).join("\n")
       if(x.nodeName === "PRE") return x.textContent.slice('Copy code'.length);
       return x.textContent
     })
     .join("\n\n");
   
-    result.push(answer || question);
+    if(answer || question)
+      result.push(answer || question);
   }
   return result;
+
+  // private function
+  function _removeQuotes(text) {
+    return text.replace(/^“|”|"/g, '').replace(/“|”|"$/g, '');
+  }
 }
 
-function removeQuotes(text) {
-  return text.replace(/^“|”|"/g, '').replace(/“|”|"$/g, '');
-}
 
 function download(filename, text) {
   var element = document.createElement('a');
